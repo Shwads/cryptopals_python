@@ -1,7 +1,7 @@
 import random
 import sys
 
-from cryptopals.lib.conversions import hex_string_to_int
+from cryptopals.lib.hex import hex_string_to_int
 
 
 def main():
