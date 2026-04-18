@@ -1,3 +1,6 @@
+from enum import Enum
+
+
 int_char_map = {
     0: 'A', 16: 'Q', 32: 'g', 48: 'w',
     1: 'B', 17: 'R', 33: 'h', 49: 'x',
@@ -17,6 +20,32 @@ int_char_map = {
     15: 'P', 31: 'f', 47: 'v', 63: '/',
 }
 
+def bytes_to_base64(arr: bytearray) -> str:
+    if len(arr) == 0:
+        return ''
+    bit_count = len(arr) * 8
+    v = 3 - ((len(arr) * 4) % 3)
+    padding = v if v != 3 else 0
+    pad_chars = '=' * padding
+    bit_count += padding
+    chomps = arr[:]
+    # always put an extra byte at the end so can index
+    # N + 1 without going out of bounds
+    chomps.extend(bytearray(1))
+    base64_str = ""
 
-def bytes_to_base64(arr: bytes) -> str:
-    pass
+    for bit in range(0, bit_count, 6):
+        index = bit // 8
+        remainder = bit % 8
+        curr_byte = chomps[index]
+        next_byte = chomps[index+1]
+        joined = (curr_byte << 8) | next_byte
+        # Taking the pointers in our word as p1 and p2
+        # we find the distance between p2 and the required shift
+        # by taking the offset from the byte start (bit // 8)
+        # plus the length of the character from the end.
+        shift = 16 - (remainder + 6)
+        num = (joined >> shift) & 63
+        base64_char = int_char_map[num]
+        base64_str += base64_char
+    return base64_str + pad_chars
