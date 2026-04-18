@@ -15,3 +15,7 @@ def xor_hex_strings(hex_string1: str, hex_string2: str) -> str:
     ba1 = hex_string_to_bytearray(hex_string1)
     ba2 = hex_string_to_bytearray(hex_string2)
     return bytearray_to_hex_string(xor_bytearrays(ba1, ba2))
+
+
+def decode_hex_single_byte(hex_string: str) -> str:
+    i = 1
