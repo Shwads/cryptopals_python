@@ -14,29 +14,29 @@ int_to_hexit = {
 }
 
 
-def hex_string_to_int(hex: str) -> int:
+def hex_string_to_int(hex_str: str) -> int:
     exponent = 0
     total = 0
-    for char in reversed(hex.lower()):
+    for char in reversed(hex_str.lower()):
         try:
-            total += hexit_to_decimal [char] * pow(16, exponent)
-        except KeyError:
-            raise ValueError(f"Invalid hexadecimal character {char}")
+            total += hexit_to_decimal[char] * pow(16, exponent)
+        except KeyError as e:
+            raise ValueError(f"Invalid hexadecimal character {char}") from e
         exponent += 1
     return total
 
 
-def hex_string_to_bytearray(hex: str) -> bytearray:
+def hex_string_to_bytearray(hex_str: str) -> bytearray:
     chomps = bytearray()
-    if len(hex) == 0:
+    if len(hex_str) == 0:
         return chomps
-    if len(hex) % 2 > 0:
-        hex = '0' + hex
+    if len(hex_str) % 2 > 0:
+        hex_str = '0' + hex_str
 
     s = 0
     e = 1
-    while e < len(hex):
-        chomp = hex_string_to_int(hex[s] + hex[e]).to_bytes()
+    while e < len(hex_str):
+        chomp = hex_string_to_int(hex_str[s] + hex_str[e]).to_bytes(1, 'big')
         chomps.append(chomp[0])
         s += 2
         e += 2
@@ -47,6 +47,6 @@ def bytearray_to_hex_string(ba: bytearray) -> str:
     hex_str = ""
     for b in ba:
         first = int_to_hexit[b >> 4]
-        last = int_to_hexit[b & int('0b00001111', 2)]
+        last = int_to_hexit[b & 0b00001111]
         hex_str += (first + last)
     return hex_str
