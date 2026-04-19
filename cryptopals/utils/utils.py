@@ -4,7 +4,25 @@ from cryptopals.utils.hex import (
     bytearray_to_hex_string,
     hex_string_to_bytearray
 )
-from cryptopals.utils.plaintext import get_dumb_plaintext_score
+from cryptopals.utils.plaintext import (
+    bytearray_to_ascii,
+    get_dumb_plaintext_score,
+    score_bytearray
+)
+
+
+class ScoredDecodedText:
+    text: str
+    score: float
+    
+    def __init__(
+        self,
+        *,
+        text: str,
+        score: float,
+    ):
+        self.text = text
+        self.score = score
 
 
 def hex_string_to_base64(hex_string: str) -> str:
@@ -18,17 +36,16 @@ def xor_hex_strings(hex_string1: str, hex_string2: str) -> str:
     return bytearray_to_hex_string(xor_bytearrays(ba1, ba2))
 
 
-def decode_hex_single_byte(hex_string: str) -> str:
+def decode_hex_single_byte(hex_string: str) -> list[ScoredDecodedText]:
     ba = hex_string_to_bytearray(hex_string)
     i = 1
-    max_score = 0
-    max_score_base64 = ""
+    solution_scores: list[ScoredDecodedText] = []
     while i < 256:
         as_byte = i.to_bytes(1, 'big')
         decoded_maybe = xor_bytearray_byte(ba, as_byte)
-        as_base64 = hex_string_to_base64(bytearray_to_hex_string(decoded_maybe))  # noqa: E501
-        if get_dumb_plaintext_score(as_base64) > max_score:
-            max_score = get_dumb_plaintext_score(as_base64)
-            max_score_base64 = as_base64
+        solution = bytearray_to_ascii(decoded_maybe)
+        solution_score = get_dumb_plaintext_score(solution) + score_bytearray(decoded_maybe)
+        solution_scores.append(ScoredDecodedText(score=solution_score, text=solution))
         i += 1
-    return max_score_base64
+    sorted_scores = sorted(solution_scores, key=lambda scored_sol: scored_sol.score)
+    return sorted_scores[-5:]
