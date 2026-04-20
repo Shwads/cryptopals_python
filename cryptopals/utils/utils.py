@@ -1,6 +1,6 @@
 from collections.abc import Callable
 from cryptopals.utils.base64 import bytes_to_base64
-from cryptopals.utils.bytearrays import repeating_xor_bytearray, xor_bytearray_byte, xor_bytearrays
+from cryptopals.utils.bytearrays import calculate_hamming_distance, repeating_xor_bytearray, xor_bytearray_byte, xor_bytearrays
 from cryptopals.utils.hex import (
     bytearray_to_hex_string,
     hex_string_to_bytearray
@@ -92,3 +92,9 @@ def repeating_xor_strings(
     text_chomp = plaintext_to_bytearray(text)
     encrypted = repeating_xor_bytearray(ba=text_chomp, key=key_chomp)
     return bytearray_to_hex_string(encrypted)
+
+
+def calculate_hamming_distance_strings(string1: str, string2: str) -> int:
+    ba1 = plaintext_to_bytearray(string1)
+    ba2 = plaintext_to_bytearray(string2)
+    return calculate_hamming_distance(ba1, ba2)

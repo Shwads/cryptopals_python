@@ -35,3 +35,15 @@ def repeating_xor_bytearray(
         xored = ba[i] ^ key[i % len(key)]
         result.append(xored)
     return result
+
+
+def calculate_hamming_distance(ba1: bytearray, ba2: bytearray) -> int:
+    if len(ba1) != len(ba2):
+        raise ValueError(
+            ERROR_MESSAGE_LENGTH_NOT_EQUAL.format("hamming distance")
+        )
+    hamming_distance = 0
+    for b1, b2 in zip(ba1, ba2):
+        for shift in range(0, 8):
+            hamming_distance += ((b1 >> shift) & 1) ^ ((b2 >> shift) & 1)
+    return hamming_distance
