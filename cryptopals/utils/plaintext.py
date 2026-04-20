@@ -31,3 +31,9 @@ def get_dumb_plaintext_score(text: str) -> float:
 
 def bytearray_to_ascii(ba: bytearray) -> str:
     return ba.decode(encoding='ascii', errors='ignore')
+
+
+def plaintext_to_bytearray(text: str) -> bytearray:
+    b = bytearray()
+    b.extend(text.encode(encoding='utf-8'))
+    return b

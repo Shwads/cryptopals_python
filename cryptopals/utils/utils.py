@@ -1,6 +1,6 @@
 from collections.abc import Callable
 from cryptopals.utils.base64 import bytes_to_base64
-from cryptopals.utils.bytearrays import xor_bytearray_byte, xor_bytearrays
+from cryptopals.utils.bytearrays import repeating_xor_bytearray, xor_bytearray_byte, xor_bytearrays
 from cryptopals.utils.hex import (
     bytearray_to_hex_string,
     hex_string_to_bytearray
@@ -8,6 +8,7 @@ from cryptopals.utils.hex import (
 from cryptopals.utils.plaintext import (
     bytearray_to_ascii,
     get_dumb_plaintext_score,
+    plaintext_to_bytearray,
     score_bytearray
 )
 
@@ -69,10 +70,6 @@ def add_encoded_property_to_scored_decoded_text(
 def decode_hex_strings_single_byte(
     hex_strings: list[str],
 ) -> list[ScoredDecodedText]:
-    """
-    returns a dictionary mapping the index of string in the given list to
-    it's returned score object from decode function
-    """
     index_solution_map = {}
     solutions: list[ScoredDecodedText] = []
     for i in range(0, len(hex_strings)):
@@ -82,7 +79,16 @@ def decode_hex_strings_single_byte(
         ))
         index_solution_map[i] = scored_decoded_output
         solutions.extend(scored_decoded_output)
-    # sorted_values = sorted(index_solution_map.values(), key=lambda val: val[0].score)
     sorted_values = sorted(solutions, key=lambda sct: sct.score)
-    # print([sct.text for sct in sorted_values[-5:]])
     return sorted_values[-5:]
+
+
+def repeating_xor_strings(
+    *,
+    text: str,
+    key: str,
+) -> str:
+    key_chomp = plaintext_to_bytearray(key)
+    text_chomp = plaintext_to_bytearray(text)
+    encrypted = repeating_xor_bytearray(ba=text_chomp, key=key_chomp)
+    return bytearray_to_hex_string(encrypted)

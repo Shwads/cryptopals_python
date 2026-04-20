@@ -23,3 +23,15 @@ def xor_bytearray_byte(ba: bytearray, b: bytes) -> bytearray:
         )
     ba2 = bytearray(b * len(ba))
     return xor_bytearrays(ba, ba2)
+
+
+def repeating_xor_bytearray(
+    *,
+    ba: bytearray,
+    key: bytearray
+) -> bytearray:
+    result = bytearray()
+    for i in range(0, len(ba)):
+        xored = ba[i] ^ key[i % len(key)]
+        result.append(xored)
+    return result
