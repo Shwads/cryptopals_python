@@ -83,6 +83,14 @@ def decode_hex_strings_single_byte(
     return sorted_values[-5:]
 
 
+def dumb_read_file_strings(filename: str) -> list[str]:
+    strings = []
+    with open(filename) as textfile:
+        for line in textfile:
+            strings.append(line[:-1])
+    return strings
+
+
 def repeating_xor_strings(
     *,
     text: str,

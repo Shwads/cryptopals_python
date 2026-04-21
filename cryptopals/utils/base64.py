@@ -1,4 +1,4 @@
-from enum import Enum
+import struct
 
 
 int_char_map = {
@@ -19,6 +19,27 @@ int_char_map = {
     14: 'O', 30: 'e', 46: 'u', 62: '+',
     15: 'P', 31: 'f', 47: 'v', 63: '/',
 }
+
+
+char_int_map = {
+    'A': 0, 'Q': 16, 'g': 32, 'w': 48,
+    'B': 1, 'R': 17, 'h': 33, 'x': 49,
+    'C': 2, 'S': 18, 'i': 34, 'y': 50,
+    'D': 3, 'T': 19, 'j': 35, 'z': 51,
+    'E': 4, 'U': 20, 'k': 36, '0': 52,
+    'F': 5, 'V': 21, 'l': 37, '1': 53,
+    'G': 6, 'W': 22, 'm': 38, '2': 54,
+    'H': 7, 'X': 23, 'n': 39, '3': 55,
+    'I': 8, 'Y': 24, 'o': 40, '4': 56,
+    'J': 9, 'Z': 25, 'p': 41, '5': 57,
+    'K': 10, 'a': 26, 'q': 42, '6': 58,
+    'L': 11, 'b': 27, 'r': 43, '7': 59,
+    'M': 12, 'c': 28, 's': 44, '8': 60,
+    'N': 13, 'd': 29, 't': 45, '9': 61,
+    'O': 14, 'e': 30, 'u': 46, '+': 62,
+    'P': 15, 'f': 31, 'v': 47, '/': 63,
+}
+
 
 def bytes_to_base64(arr: bytearray) -> str:
     if len(arr) == 0:
@@ -49,3 +70,49 @@ def bytes_to_base64(arr: bytearray) -> str:
         base64_char = int_char_map[num]
         base64_str += base64_char
     return base64_str + pad_chars
+
+
+def base64_to_bytearray(base64_str: str) -> bytearray:
+    # return rec_base64_to_bytearray(base64_str)
+    if base64_str == "":
+        return bytearray()
+    end = -1
+    padding = 0
+    while base64_str[end] == '=':
+        padding += 1
+        end -= 1
+    bit_count = ((len(base64_str) - padding) * 6) - (padding * 2)
+    output = bytearray()
+    for i in range(0, bit_count, 8):
+        curr_index = i // 6
+        offset = i % 6
+        byte_start = char_int_map[base64_str[curr_index]] << 2
+        byte_end = char_int_map[base64_str[curr_index+1]]
+        curr_byte_start = (((255 >> offset) & byte_start) << offset)
+        curr_byte_end = (byte_end >> (4 - offset))
+        full_byte = curr_byte_start | curr_byte_end
+        output.append(full_byte)
+    return output
+
+
+def rec_base64_to_bytearray(base64_str: str) -> bytearray:
+    if base64_str == "":
+        return bytearray()
+    end = -1
+    padding = 0
+    while base64_str[end] == '=':
+        padding += 1
+        end -= 1
+    bit_count = ((len(base64_str) - padding) * 6) - (padding * 2)
+    def inner(bit_start: int, ba: bytearray) -> bytearray:
+        if not bit_start + 8 <= bit_count:
+            return ba
+        curr_char_index = bit_start // 6
+        byte_start = char_int_map[base64_str[curr_char_index]] << 2
+        byte_end = char_int_map[base64_str[curr_char_index+1]]
+        offset = bit_start % 6
+        curr_byte_start = (((255 >> offset) & byte_start) << offset)
+        curr_byte_end = (byte_end >> (4 - offset))
+        ba.append(curr_byte_start | curr_byte_end)
+        return inner(bit_start + 8, ba)
+    return inner(0, bytearray())
